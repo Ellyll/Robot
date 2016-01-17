@@ -24,9 +24,12 @@ const mainBody = (x, y, radius) => {
 };
 
 const makeRobot = (x, y, size) => {
+    let mainBodyRadius = size/3;
+    let headRadius = mainBodyRadius*3/5;
+    
     let _size = size;
-    let _mainBody = mainBody(x, y+size/6, size/3);
-    let _head = head(x, y+size/6-size/3+(size/4)/2, size/4);
+    let _mainBody = mainBody(x, y+mainBodyRadius/2, mainBodyRadius);
+    let _head = head(x, _mainBody.y-_mainBody.radius-headRadius/8, headRadius);
 
     let robot = {
         get size() { return _size; },
@@ -44,16 +47,31 @@ const renderMainBody = (context, mainBody) => {
 
 const renderHead = (context, head) => {
     console.log('renderHead()');
-    let startAngle = (3*Math.PI/2) - (Math.PI/3);
-    let endAngle = (3*Math.PI/2) + (Math.PI/3);
-    gfx.drawArc(context, head.x, head.y, head.radius, startAngle, endAngle, false, 'red');
-    
-    let x1 = head.x + head.radius*Math.cos(startAngle);
-    let y1 = head.y + head.radius*Math.sin(startAngle);
-    let x2 = head.x + head.radius*Math.cos(endAngle);
-    let y2 = head.y + head.radius*Math.sin(endAngle);
-    gfx.drawLine(context, x1, y1, x2, y2, 'red');
-
+    gfx.drawArc(context, head.x, head.y, head.radius, Math.PI, 0, false, 'red');
+    gfx.drawRectangle(context, head.x-head.radius, head.y, head.radius*2, head.radius/8, 'red');
+    let points = [
+        {
+            x: head.x-head.radius,
+            y: head.y+head.radius/8 
+        },
+        {
+            x: (head.x-head.radius)+(head.radius/6),
+            y: (head.y+head.radius/8)+(head.radius/6)            
+        },
+        {
+            x: (head.x-head.radius)+(head.radius/6),
+            y: (head.y+head.radius/8)+(head.radius/6)            
+        },
+        {
+            x: (head.x+head.radius)-(head.radius/6),
+            y: (head.y+head.radius/8)+(head.radius/6),
+        },
+        {
+            x: head.x+head.radius,
+            y: head.y+head.radius/8            
+        }
+    ];
+    gfx.drawPolygon(context, points, 'red', 'yellow');
 };
 
 const renderRobot = (context, robot) => {
