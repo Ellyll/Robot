@@ -18,10 +18,14 @@ function drawRectangle(context, x, y, width, height, strokeStyle, fillStyle) {
 }
 
 function drawCircle(context, x, y, radius, strokeStyle, fillStyle) {
+    drawArc(context, x, y, radius, 0, Math.PI*2, false, strokeStyle, fillStyle);
+}
+
+function drawArc(context, x, y, radius, startAngle, endAngle, anticlockwise, strokeStyle, fillStyle) {
     context.beginPath();
     if (typeof strokeStyle !== 'undefined') context.strokeStyle = strokeStyle;
     if (typeof fillStyle !== 'undefined') context.fillStyle = fillStyle;
-    context.arc(x, y, radius, 0, Math.PI*2, false);
+    context.arc(x, y, radius, startAngle, endAngle, anticlockwise);
     if (typeof strokeStyle !== 'undefined') context.stroke();
     if (typeof fillStyle !== 'undefined') context.fill();
 }
@@ -35,4 +39,4 @@ function clearCanvas(context) {
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 }
 
-export { drawLine, drawRectangle, drawCircle, maximiseCanvas, clearCanvas };
+export { drawLine, drawRectangle, drawCircle, drawArc, maximiseCanvas, clearCanvas };
