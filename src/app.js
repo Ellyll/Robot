@@ -13,19 +13,19 @@ function init() {
     
     let x = canvas.width / 2;
     let y = canvas.height / 2;
-    let size = Math.min(canvas.width, canvas.height)*0.5;
+    let size = Math.min(canvas.width, canvas.height)*0.75;
     
     let speed = size/8000; // pixels / ms
     let distanceToTravel = size*3;
      
     let robot1 = robot.makeRobot(x, y, size);
-    robot.renderRobot(context, robot1);
-    let robot2 = robot1.moveRelative(robot1.size);
-    robot.renderRobot(context, robot2);
+    // robot.renderRobot(context, robot1);
+    // let robot2 = robot1.moveRelative(robot1.size);
+    // robot.renderRobot(context, robot2);
 
-    // window.requestAnimationFrame((currentTime) => {
-    //     draw(context, currentTime, currentTime, speed, distanceToTravel, robot1);
-    // });    
+    window.requestAnimationFrame((currentTime) => {
+        draw(context, currentTime, currentTime, speed, distanceToTravel, robot1);
+    });    
 }
 
 function draw(context, currentTime, lastTime, speed, distanceToTravel, aRobot) {

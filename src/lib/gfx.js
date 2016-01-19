@@ -54,4 +54,8 @@ function clearCanvas(context) {
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 }
 
-export { drawLine, drawRectangle, drawCircle, drawArc, drawPolygon, maximiseCanvas, clearCanvas };
+function degToRad(degrees) {
+    return (degrees/360)*Math.PI*2;
+}
+
+export { drawLine, drawRectangle, drawCircle, drawArc, drawPolygon, maximiseCanvas, clearCanvas, degToRad };

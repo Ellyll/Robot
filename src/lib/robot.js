@@ -1,6 +1,10 @@
 "use strict";
 
 import * as gfx from './gfx.js';
+const PI = Math.PI;
+const degToRad = gfx.degToRad;
+const cos = Math.cos;
+const sin = Math.sin;
 
 const hasLocation = (x,y) => {
     let _x = x;
@@ -32,10 +36,10 @@ const makeMainBody = (x, y, radius, angle) => {
     let newMainBody;
     let _moveRelative = (xDistance) => {
         //console.log('_moveRelative', newMainBody);
-        let newAngle = newMainBody.angle + (xDistance/(2*Math.PI*newMainBody.radius))*Math.PI*2;
-        if (newAngle > 2*Math.PI) newAngle = newAngle % (2*Math.PI);
-        if (newAngle < -2*Math.PI) newAngle = newAngle % (-2*Math.PI);
-        if (newAngle < 0) newAngle = 2*Math.PI - newAngle;
+        let newAngle = newMainBody.angle + (xDistance/(2*PI*newMainBody.radius))*PI*2;
+        if (newAngle > 2*PI) newAngle = newAngle % (2*PI);
+        if (newAngle < -2*PI) newAngle = newAngle % (-2*PI);
+        if (newAngle < 0) newAngle = 2*PI - newAngle;
         return makeMainBody(newMainBody.x+xDistance, newMainBody.y, newMainBody.radius, newAngle);
     };  
     
@@ -71,75 +75,83 @@ const makeRobot = (x, y, size, mainBody) => {
 
 const renderMainBody = (context, mainBody) => {
     //console.log('renderMainBody()', context, mainBody);
-    gfx.drawCircle(context, mainBody.x, mainBody.y, mainBody.radius, 'white');
-    gfx.drawCircle(context, mainBody.x, mainBody.y, mainBody.radius*(1/2), 'white');
-    gfx.drawCircle(context, mainBody.x, mainBody.y, mainBody.radius*(5/8), 'white');
+    const x = mainBody.x;
+    const y = mainBody.y;
+    const radius = mainBody.radius;
+    const angle = mainBody.angle;
+    const colour = 'white';
     
-    for (let a=mainBody.angle, r=mainBody.radius*(5/16); a < mainBody.angle+Math.PI*2; a += Math.PI/2) {
-        const x = mainBody.x + r*Math.cos(a);
-        const y = mainBody.y + r*Math.sin(a);
-        gfx.drawCircle(context, x, y, r/9, 'white');
-        gfx.drawCircle(context, x, y, r/27, 'white');
+    // Outer shell
+    gfx.drawCircle(context, x, y, radius, colour);
+    
+    // Inner rings
+    const ring1Radius = radius*(0.67);
+    const ring2Radius = radius*(5/8);
+    const ring3Radius = radius*(1/2);
+    gfx.drawCircle(context, x, y, ring1Radius, colour);
+    gfx.drawCircle(context, x, y, ring3Radius, colour);
+    
+    // Inner rings decorations
+    const drawRingLine = (startRingRadius, endRingRadius, angleOffset) => {
+        gfx.drawLine(
+            context,
+            x + startRingRadius*cos(angle+angleOffset), y + startRingRadius*sin(angle+angleOffset),
+            x + endRingRadius*cos(angle+angleOffset), y + endRingRadius*sin(angle+angleOffset),
+            colour
+        );        
+    };
+    drawRingLine(ring1Radius, ring3Radius, degToRad(20));
+    drawRingLine(ring1Radius, ring3Radius, degToRad(50));
+    gfx.drawCircle(
+        context,
+        x + ((ring3Radius+ring1Radius)/2)*cos(angle+degToRad(60)),
+        y + ((ring3Radius+ring1Radius)/2)*sin(angle+degToRad(60)),
+        ((ring1Radius-ring3Radius)*0.75)/2,
+        colour
+    );
+    drawRingLine(ring1Radius, ring2Radius, degToRad(100));
+    drawRingLine(ring1Radius, ring2Radius, degToRad(140));
+    gfx.drawArc(context, x, y, ring2Radius, angle+degToRad(100), angle+degToRad(140), false, colour);
+    drawRingLine(ring1Radius, ring3Radius, degToRad(150));
+    gfx.drawArc(context, x, y, ring2Radius, angle+degToRad(150), angle+degToRad(290), false, colour);
+    drawRingLine(ring1Radius, ring3Radius, degToRad(290));
+    drawRingLine(ring2Radius, ring3Radius - (ring2Radius-ring1Radius), degToRad(295));
+    drawRingLine(ring2Radius, ring3Radius - (ring2Radius-ring1Radius), degToRad(300));
+    drawRingLine(ring2Radius, ring3Radius - (ring2Radius-ring1Radius), degToRad(305));
 
+    // Spokes    
+    for (let a=angle, r=radius*(6/16); a < angle+PI*2; a += PI/2) {
+        const xs = x + r*cos(a);
+        const ys = y + r*sin(a);
+        gfx.drawCircle(context, xs, ys, r/11, colour);
+        gfx.drawCircle(context, xs, ys, r/27, colour);
+
+        const b = (12/360)*PI*2;
         // line 1
-        const b = (12/360)*Math.PI*2;
-        const x1 = mainBody.x + mainBody.radius*(1/2)*Math.cos(a-b*1.0);
-        const y1 = mainBody.y + mainBody.radius*(1/2)*Math.sin(a-b*1.0);
-        const x2 = mainBody.x + mainBody.radius*(1/4)*Math.cos(a-b);
-        const y2 = mainBody.y + mainBody.radius*(1/4)*Math.sin(a-b);
-        gfx.drawLine(context, x1, y1, x2, y2, 'white');  
+        const x1 = x + radius*(0.5)*cos(a-b*0.9);
+        const y1 = y + radius*(0.5)*sin(a-b*0.9);
+        const x2 = x + radius*(0.35)*cos(a-b);
+        const y2 = y + radius*(0.35)*sin(a-b);
+        gfx.drawLine(context, x1, y1, x2, y2, colour);  
         
         // line 2
-        const x3 = mainBody.x + mainBody.radius*(1/2)*Math.cos(a+b*1.0);
-        const y3 = mainBody.y + mainBody.radius*(1/2)*Math.sin(a+b*1.01);
-        const x4 = mainBody.x + mainBody.radius*(1/4)*Math.cos(a+b);
-        const y4 = mainBody.y + mainBody.radius*(1/4)*Math.sin(a+b);
-        gfx.drawLine(context, x3, y3, x4, y4, 'white');
+        const x3 = x + radius*(0.5)*cos(a+b*0.9);
+        const y3 = y + radius*(0.5)*sin(a+b*0.9);
+        const x4 = x + radius*(0.35)*cos(a+b);
+        const y4 = y + radius*(0.35)*sin(a+b);
+        gfx.drawLine(context, x3, y3, x4, y4, colour);
         
-        // 3
+        // arc 3
         const xc = (x2+x4)/2;
         const yc = (y2+y4)/2;
         const rc = Math.sqrt((x4-x2)*(x4-x2) + (y4-y2)*(y4-y2))/2;
-        //let arcAngle = Math.acos((x4-xc)/rc);
-        //if ( (x4-xc) < 0 ) arcAngle = Math.PI - arcAngle;
-        //let clockwise = (y4 >= y2) ? true : false; 
-        //gfx.drawArc(context, xc, yc, rc, arcAngle+Math.PI, arcAngle, true, 'yellow');
-        gfx.drawArc(context, xc, yc, rc, a-Math.PI/2, a+Math.PI/2, true, 'yellow');
-        //gfx.drawCircle(context, xc, yc, rc, 'yellow');
-        
-        // context.beginPath();
-        // context.strokeStyle = 'white';
-        // const arcRadius = 500; // Math.sqrt((x4-x3)*(x4-x3) + (y4-y3)*(y4-y3));
-        // context.moveTo(x2,y2);
-        // context.arcTo(x2, y2, x4, y4, arcRadius);
-        // //context.moveTo(x2,y2);
-        // //context.lineTo(x4, y4);
-        // context.stroke();
-
-        
-        // const lineWidth = context.lineWidth;
-        // const lineCap = context.lineCap;
-        // context.lineWidth = 10;
-        // context.lineCap = 'round';
-        // gfx.drawLine(
-        //     context,
-        //     mainBody.x + mainBody.radius*(1/2)*Math.cos(a),
-        //     mainBody.y + mainBody.radius*(1/2)*Math.sin(a),
-        //     mainBody.x + mainBody.radius*(1/4)*Math.cos(a),
-        //     mainBody.y + mainBody.radius*(1/4)*Math.sin(a),
-        //     'white'
-        // );
-        // context.lineWidth = lineWidth;
+        gfx.drawArc(context, xc, yc, rc, a-PI/2, a+PI/2, true, colour);
     }
-    
-    // let x2 = mainBody.x + mainBody.radius*Math.cos(mainBody.angle+Math.PI*3/2);
-    // let y2 = mainBody.y + mainBody.radius*Math.sin(mainBody.angle+Math.PI*3/2);
-    // gfx.drawLine(context, mainBody.x, mainBody.y, x2, y2, 'white');
 };
 
 const renderHead = (context, head) => {
     //console.log('renderHead()');
-    gfx.drawArc(context, head.x, head.y, head.radius, Math.PI, 0, false, 'red');
+    gfx.drawArc(context, head.x, head.y, head.radius, PI, 0, false, 'red');
     gfx.drawRectangle(context, head.x-head.radius, head.y, head.radius*2, head.radius/8, 'red');
     let points = [
         {
