@@ -72,10 +72,69 @@ const makeRobot = (x, y, size, mainBody) => {
 const renderMainBody = (context, mainBody) => {
     //console.log('renderMainBody()', context, mainBody);
     gfx.drawCircle(context, mainBody.x, mainBody.y, mainBody.radius, 'white');
+    gfx.drawCircle(context, mainBody.x, mainBody.y, mainBody.radius*(1/2), 'white');
+    gfx.drawCircle(context, mainBody.x, mainBody.y, mainBody.radius*(5/8), 'white');
     
-    let x2 = mainBody.x + mainBody.radius*Math.cos(mainBody.angle+Math.PI*3/2);
-    let y2 = mainBody.y + mainBody.radius*Math.sin(mainBody.angle+Math.PI*3/2);
-    gfx.drawLine(context, mainBody.x, mainBody.y, x2, y2, 'white');
+    for (let a=mainBody.angle, r=mainBody.radius*(5/16); a < mainBody.angle+Math.PI*2; a += Math.PI/2) {
+        const x = mainBody.x + r*Math.cos(a);
+        const y = mainBody.y + r*Math.sin(a);
+        gfx.drawCircle(context, x, y, r/9, 'white');
+        gfx.drawCircle(context, x, y, r/27, 'white');
+
+        // line 1
+        const b = (12/360)*Math.PI*2;
+        const x1 = mainBody.x + mainBody.radius*(1/2)*Math.cos(a-b*1.0);
+        const y1 = mainBody.y + mainBody.radius*(1/2)*Math.sin(a-b*1.0);
+        const x2 = mainBody.x + mainBody.radius*(1/4)*Math.cos(a-b);
+        const y2 = mainBody.y + mainBody.radius*(1/4)*Math.sin(a-b);
+        gfx.drawLine(context, x1, y1, x2, y2, 'white');  
+        
+        // line 2
+        const x3 = mainBody.x + mainBody.radius*(1/2)*Math.cos(a+b*1.0);
+        const y3 = mainBody.y + mainBody.radius*(1/2)*Math.sin(a+b*1.01);
+        const x4 = mainBody.x + mainBody.radius*(1/4)*Math.cos(a+b);
+        const y4 = mainBody.y + mainBody.radius*(1/4)*Math.sin(a+b);
+        gfx.drawLine(context, x3, y3, x4, y4, 'white');
+        
+        // 3
+        const xc = (x2+x4)/2;
+        const yc = (y2+y4)/2;
+        const rc = Math.sqrt((x4-x2)*(x4-x2) + (y4-y2)*(y4-y2))/2;
+        //let arcAngle = Math.acos((x4-xc)/rc);
+        //if ( (x4-xc) < 0 ) arcAngle = Math.PI - arcAngle;
+        //let clockwise = (y4 >= y2) ? true : false; 
+        //gfx.drawArc(context, xc, yc, rc, arcAngle+Math.PI, arcAngle, true, 'yellow');
+        gfx.drawArc(context, xc, yc, rc, a-Math.PI/2, a+Math.PI/2, true, 'yellow');
+        //gfx.drawCircle(context, xc, yc, rc, 'yellow');
+        
+        // context.beginPath();
+        // context.strokeStyle = 'white';
+        // const arcRadius = 500; // Math.sqrt((x4-x3)*(x4-x3) + (y4-y3)*(y4-y3));
+        // context.moveTo(x2,y2);
+        // context.arcTo(x2, y2, x4, y4, arcRadius);
+        // //context.moveTo(x2,y2);
+        // //context.lineTo(x4, y4);
+        // context.stroke();
+
+        
+        // const lineWidth = context.lineWidth;
+        // const lineCap = context.lineCap;
+        // context.lineWidth = 10;
+        // context.lineCap = 'round';
+        // gfx.drawLine(
+        //     context,
+        //     mainBody.x + mainBody.radius*(1/2)*Math.cos(a),
+        //     mainBody.y + mainBody.radius*(1/2)*Math.sin(a),
+        //     mainBody.x + mainBody.radius*(1/4)*Math.cos(a),
+        //     mainBody.y + mainBody.radius*(1/4)*Math.sin(a),
+        //     'white'
+        // );
+        // context.lineWidth = lineWidth;
+    }
+    
+    // let x2 = mainBody.x + mainBody.radius*Math.cos(mainBody.angle+Math.PI*3/2);
+    // let y2 = mainBody.y + mainBody.radius*Math.sin(mainBody.angle+Math.PI*3/2);
+    // gfx.drawLine(context, mainBody.x, mainBody.y, x2, y2, 'white');
 };
 
 const renderHead = (context, head) => {
