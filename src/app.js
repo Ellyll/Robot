@@ -15,13 +15,16 @@ function init() {
     let canvas2 = document.createElement('canvas');
     canvas2.width = canvas.width;
     canvas2.height = canvas.height;
-    let contextBuffer = canvas2.getContext('2d');
+    let context2 = canvas2.getContext('2d');
+    
+    let contextBuffers = [ context, context2 ];
+    let bufferCounter = 0;
 
     let size = Math.min(canvas.width, canvas.height)*0.25;    
     let x = -size;
     let y = canvas.height / 2;
     
-    let speed = canvas.width/12000; // pixels / ms
+    let speed = canvas.width/14000; // pixels / ms
     let distanceToTravel = canvas.width+size*2;
      
     let robot1 = robot.makeRobot(x, y, size);
@@ -38,9 +41,15 @@ function init() {
         let deltaDistance = speed * deltaTime;
         
         let newRobot = aRobot.moveRelative(deltaDistance);
-        gfx.clearCanvas(contextBuffer);
-        gfx.drawLine(contextBuffer, 0, aRobot.y+aRobot.size/2, context.canvas.width, aRobot.y+aRobot.size/2, 'white');
-        robot.renderRobot(contextBuffer, newRobot);
+        
+
+        let renderBuffer = contextBuffers[bufferCounter];       
+        
+        gfx.clearCanvas(renderBuffer);       
+        //renderBuffer.clearRect(aRobot.x-aRobot.size/2-1, aRobot.y-aRobot.size/2-1, aRobot.size+2, aRobot.size+2);
+        //contextBuffer.clearRect(0, 0, contextBuffer.canvas.width, contextBuffer.canvas.height);
+        gfx.drawLine(renderBuffer, 0, aRobot.y+aRobot.size/2, context.canvas.width, aRobot.y+aRobot.size/2, 'white');
+        robot.renderRobot(renderBuffer, newRobot);
         
         let newLastTime = currentTime;
         let newDistanceToTravel = distanceToTravel - deltaDistance;
@@ -52,8 +61,15 @@ function init() {
             newRobot = robot.makeRobot(-newRobot.size, newRobot.y, newRobot.size);
         }
         
-        gfx.clearCanvas(context);
-        context.drawImage(canvas2, 0, 0);
+        //gfx.clearCanvas(context);
+        //context.clearRect(aRobot.x-aRobot.size/2-1, aRobot.y-aRobot.size/2-1, aRobot.size+2, aRobot.size+2);
+        //context.drawImage(canvas2, 0, 0);
+        
+        contextBuffers[1-bufferCounter].canvas.style.visibility = 'hidden'; 
+        contextBuffers[bufferCounter].canvas.style.visibility = 'visible';
+        bufferCounter = 1-bufferCounter;
+        
+        
         window.requestAnimationFrame((currentTime) => {
             draw(currentTime, newLastTime, speed, distanceToTravel-deltaDistance, newRobot);
         });    
