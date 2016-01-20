@@ -204,8 +204,41 @@ const renderHead = (context, head) => {
     const yc1 = (yc1s+yc1e) / 2;
     const rc1 = Math.sqrt((xc1-xc1s)*(xc1-xc1s) + (yc1-yc1s)*(yc1-yc1s));
     gfx.drawArc(context, xc1, yc1, rc1, mainCameraAngle-PI/2, mainCameraAngle+PI/2, false, colour);
+
+    // Small camera rim
+    const smallCameraAngle = degToRad(-25);
+    const b = degToRad(4);
+    [-b, +b].forEach( angle => {
+        gfx.drawLine(
+            context,
+            head.x + head.radius*cos(smallCameraAngle+angle*1.2),
+            head.y + head.radius*sin(smallCameraAngle+angle*1.2),
+            head.x + head.radius*1.06*cos(smallCameraAngle+angle),
+            head.y + head.radius*1.06*sin(smallCameraAngle+angle),
+            colour
+        );        
+    });
+    gfx.drawArc(context, head.x, head.y, head.radius*1.03, smallCameraAngle-b, smallCameraAngle+b, false, colour);
+    gfx.drawArc(context, head.x, head.y, head.radius*1.06, smallCameraAngle-b, smallCameraAngle+b, false, colour);
+    // Small camera lense
+    const xc2s = head.x + head.radius*1.06*cos(smallCameraAngle-b);
+    const yc2s = head.y + head.radius*1.06*sin(smallCameraAngle-b);
+    const xc2e = head.x + head.radius*1.06*cos(smallCameraAngle+b);
+    const yc2e = head.y + head.radius*1.06*sin(smallCameraAngle+b);
+    const xc2 = (xc2s+xc2e) / 2;
+    const yc2 = (yc2s+yc2e) / 2;
+    const rc2 = Math.sqrt((xc2-xc2s)*(xc2-xc2s) + (yc2-yc2s)*(yc2-yc2s));
+    gfx.drawArc(context, xc2, yc2, rc2*0.8, smallCameraAngle-PI/2, smallCameraAngle+PI/2, false, colour);
     
     
+    // Large Antenna
+    const drawAntenna = (angle, height) => { 
+        const xa1 = head.x + head.radius*cos(angle);
+        const ya1 = head.y + head.radius*sin(angle);
+        gfx.drawLine(context, xa1, ya1, xa1, ya1-height, colour);
+    };
+    drawAntenna(PI+degToRad(35), head.radius);
+    drawAntenna(PI+degToRad(45), head.radius*0.5);
 };
 
 const renderRobot = (context, robot) => {
