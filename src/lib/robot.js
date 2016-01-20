@@ -151,8 +151,12 @@ const renderMainBody = (context, mainBody) => {
 
 const renderHead = (context, head) => {
     //console.log('renderHead()');
-    gfx.drawArc(context, head.x, head.y, head.radius, PI, 0, false, 'red');
-    gfx.drawRectangle(context, head.x-head.radius, head.y, head.radius*2, head.radius/8, 'red');
+    const colour = 'white';
+    const background = 'black';
+    
+    // Main shell
+    gfx.drawArc(context, head.x, head.y, head.radius, PI, 0, false, colour);
+    gfx.drawRectangle(context, head.x-head.radius, head.y, head.radius*2, head.radius/8, colour);
     let points = [
         {
             x: head.x-head.radius,
@@ -175,7 +179,33 @@ const renderHead = (context, head) => {
             y: head.y+head.radius/8            
         }
     ];
-    gfx.drawPolygon(context, points, 'red', 'yellow');
+    gfx.drawPolygon(context, points, colour, background);
+    
+    // Main camera rim
+    const mainCameraAngle = degToRad(-45);
+    const a = degToRad(10);
+    [-a, +a].forEach( angle => {
+        gfx.drawLine(
+            context,
+            head.x + head.radius*cos(mainCameraAngle+angle),
+            head.y + head.radius*sin(mainCameraAngle+angle),
+            head.x + head.radius*1.05*cos(mainCameraAngle+angle),
+            head.y + head.radius*1.05*sin(mainCameraAngle+angle),
+            colour
+        );        
+    });
+    gfx.drawArc(context, head.x, head.y, head.radius*1.05, mainCameraAngle-a, mainCameraAngle+a, false, colour);
+    // Main camera lense
+    const xc1s = head.x + head.radius*1.005*cos(mainCameraAngle-a);
+    const yc1s = head.y + head.radius*1.005*sin(mainCameraAngle-a);
+    const xc1e = head.x + head.radius*1.005*cos(mainCameraAngle+a);
+    const yc1e = head.y + head.radius*1.005*sin(mainCameraAngle+a);
+    const xc1 = (xc1s+xc1e) / 2;
+    const yc1 = (yc1s+yc1e) / 2;
+    const rc1 = Math.sqrt((xc1-xc1s)*(xc1-xc1s) + (yc1-yc1s)*(yc1-yc1s));
+    gfx.drawArc(context, xc1, yc1, rc1, mainCameraAngle-PI/2, mainCameraAngle+PI/2, false, colour);
+    
+    
 };
 
 const renderRobot = (context, robot) => {
