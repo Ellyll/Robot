@@ -35,7 +35,6 @@ const head = (x, y, radius) => {
 const makeMainBody = (x, y, radius, angle) => {
     let newMainBody;
     let _moveRelative = (xDistance) => {
-        //console.log('_moveRelative', newMainBody);
         let newAngle = newMainBody.angle + (xDistance/(2*PI*newMainBody.radius))*PI*2;
         if (newAngle > 2*PI) newAngle = newAngle % (2*PI);
         if (newAngle < -2*PI) newAngle = newAngle % (-2*PI);
@@ -74,7 +73,6 @@ const makeRobot = (x, y, size, mainBody) => {
 };
 
 const renderMainBody = (context, mainBody) => {
-    //console.log('renderMainBody()', context, mainBody);
     const x = mainBody.x;
     const y = mainBody.y;
     const radius = mainBody.radius;
@@ -150,7 +148,6 @@ const renderMainBody = (context, mainBody) => {
 };
 
 const renderHead = (context, head) => {
-    //console.log('renderHead()');
     const colour = 'white';
     const background = 'black';
     
@@ -242,9 +239,6 @@ const renderHead = (context, head) => {
 };
 
 const renderRobot = (context, robot) => {
-    //console.log('renderRobot()', context, robot);
-    //gfx.drawRectangle(context, robot.x-robot.size/2, robot.y-robot.size/2, robot.size, robot.size, 'green');
-
     renderMainBody(context, robot.mainBody);
     renderHead(context, robot.head);
 };

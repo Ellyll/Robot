@@ -6,7 +6,6 @@ import * as gfx from './lib/gfx.js';
 window.addEventListener('load', init);
 
 function init() {
-    console.log('init()');
     let canvas = document.getElementById('canvas');
     let context = canvas.getContext('2d');
     gfx.maximiseCanvas(canvas);
@@ -20,9 +19,6 @@ function init() {
     let distanceToTravel = canvas.width+size*2;
      
     let robot1 = robot.makeRobot(x, y, size);
-    // robot.renderRobot(context, robot1);
-    // let robot2 = robot1.moveRelative(robot1.size);
-    // robot.renderRobot(context, robot2);
 
     window.requestAnimationFrame((currentTime) => {
         draw(currentTime, currentTime, speed, distanceToTravel, robot1);
